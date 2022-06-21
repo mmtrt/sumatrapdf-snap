@@ -1,0 +1,92 @@
+name: sumatrapdf
+title: SumatraPDF (WINE)
+summary: SumatraPDF is Small, fast, customizable, free.
+description: |
+ SumatraPDF is PDF, eBook (epub, mobi), comic book (cbz/cbr), DjVu, XPS, CHM, image viewer for Windows.
+adopt-info: sumatrapdf
+
+confinement: strict
+grade: stable
+architectures:
+  - build-on: amd64
+    run-on: [amd64]
+base: core20
+compression: lzo
+
+plugs:
+  wine-runtime-c20:
+    interface: content
+    target: $SNAP/wine-runtime
+    default-provider: wine-platform-runtime-core20
+  wine-7-stable:
+    interface: content
+    target: $SNAP/wine-platform
+    default-provider: wine-platform-7-stable-core20
+
+environment:
+  WINEARCH: "win32"
+  WINEDLLOVERRIDES: "mscoree,mshtml=" # Prevent pop-ups about Wine Mono and Wine Gecko
+  RUN_EXE: "$SNAP_USER_DATA/sumatrapdf/sumatrapdf.exe"
+  SOMMELIER_KEEP_CWD: "1" # Don't change the working directory so relative paths still work
+  NO_AT_BRIDGE: "1" # Fix yad error Failed to connect to socket /tmp/dbus-xxx: No such file or directory
+  DISABLE_WAYLAND: "1" # Fix gtk decoration under wayland session
+
+apps:
+  sumatrapdf:
+    extensions: [ gnome-3-38 ]
+    command: bin/sommelier run-exe
+    plugs:
+      - opengl
+      - home
+      - network
+      - hardware-observe
+      - process-control
+      - cups-control
+      - removable-media
+    desktop: usr/share/applications/sumatrapdf.desktop
+  # The wine command can be used to run applications inside the wine
+  # environment that this snap uses.
+  #
+  # For example, users can configure the wine environment of this snap
+  # by running `myapp.wine winecfg`.
+  wine:
+    extensions: [ gnome-3-38 ]
+    command: bin/sommelier
+    plugs:
+      - home
+      - network
+      - hardware-observe
+      - process-control
+      - cups-control
+      - removable-media
+  # The winetricks command can be used to run winetricks inside the wine
+  # environment that this snap uses.
+  winetricks:
+    extensions: [ gnome-3-38 ]
+    command: bin/sommelier winetricks
+    plugs:
+      - network
+
+parts:
+  sumatrapdf:
+    plugin: nil
+    source: ./snap/local/src
+    override-build: |
+      snapcraftctl build
+      set -ex
+      ver=$(wget -qO- https://www.sumatrapdfreader.org/download-free-pdf-viewer | grep install | cut -d'-' -f2 | head -1)
+      snapcraftctl set-version "$ver"
+      mkdir -p usr/share/sumatrapdf
+      wget -qO- "https://www.sumatrapdfreader.org/dl/rel/$ver/SumatraPDF-$ver.zip" | zcat >> usr/share/sumatrapdf/sumatrapdf.exe
+      mv usr $SNAPCRAFT_PART_INSTALL
+    stage:
+      - usr
+    build-packages:
+      - wget
+      - gzip
+  # The sommelier script helps you snap Windows applications using Wine. It
+  # initializes and configures Wine and installs the Windows application.
+  sommelier:
+    plugin: make
+    source: https://github.com/mmtrt/sommelier-core.git
+    source-branch: "core20"
