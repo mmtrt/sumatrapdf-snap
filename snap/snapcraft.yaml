@@ -36,7 +36,6 @@ apps:
     extensions: [ gnome-3-38 ]
     command: bin/sommelier run-exe
     plugs:
-      - opengl
       - home
       - network
       - cups-control
