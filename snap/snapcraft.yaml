@@ -39,8 +39,6 @@ apps:
       - opengl
       - home
       - network
-      - hardware-observe
-      - process-control
       - cups-control
       - removable-media
   # The wine command can be used to run applications inside the wine
@@ -54,8 +52,6 @@ apps:
     plugs:
       - home
       - network
-      - hardware-observe
-      - process-control
       - cups-control
       - removable-media
   # The winetricks command can be used to run winetricks inside the wine
