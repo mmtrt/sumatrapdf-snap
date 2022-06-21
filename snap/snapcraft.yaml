@@ -43,7 +43,6 @@ apps:
       - process-control
       - cups-control
       - removable-media
-    desktop: usr/share/applications/sumatrapdf.desktop
   # The wine command can be used to run applications inside the wine
   # environment that this snap uses.
   #
