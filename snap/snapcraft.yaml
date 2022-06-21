@@ -70,11 +70,12 @@ parts:
       set -ex
       ver=$(wget -qO- https://www.sumatrapdfreader.org/download-free-pdf-viewer | grep install | cut -d'-' -f2 | head -1)
       snapcraftctl set-version "$ver"
-      mkdir -p usr/share/sumatrapdf
+      mkdir -p usr/share/sumatrapdf sommelier/hooks
       wget -qO- "https://www.sumatrapdfreader.org/dl/rel/$ver/SumatraPDF-$ver.zip" | zcat >> usr/share/sumatrapdf/sumatrapdf.exe
-      mv usr $SNAPCRAFT_PART_INSTALL
+      mv pre-install sommelier/hooks ; mv usr $SNAPCRAFT_PART_INSTALL ; mv sommelier $SNAPCRAFT_PART_INSTALL
     stage:
       - usr
+      - sommelier
     build-packages:
       - wget
       - gzip
