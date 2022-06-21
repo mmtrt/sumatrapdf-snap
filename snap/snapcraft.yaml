@@ -89,4 +89,4 @@ parts:
   sommelier:
     plugin: make
     source: https://github.com/mmtrt/sommelier-core.git
-    source-branch: "core20"
+    source-branch: "tmp-core20"
